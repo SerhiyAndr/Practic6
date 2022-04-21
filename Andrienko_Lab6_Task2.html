@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Функции для арифметичесих действий</title>
+</head>
+<body>
+    <style>
+    </style>
+    <div id="alert-div">
+       Методы alert(), confirm() и prompt() являются блокирующими, т. е. они не возвращают управление документом, пока пользователь не отреагирует на запрос диалогового окна.
+       Это значит, что когда выводится одно из таких окон,
+       программный код прекращает исполнение, а текущий документ прекращает загружаться на время показа диалогового окна и возобновляется после его закрытия.<br/>
+      <big>alert()</big>выводит сообщение и ждёт, пока пользователь нажмёт OK.<br />
+      <big>prompt()</big>выводит сообщение и ждёт, пока пользователь введёт текст, а затем возвращает введённое значение или null, если ввод отменён (Cancel или Esc).<br />
+      <big> confirm() </big>выводит сообщение и ждёт, пока пользователь нажмёт OK или Cancel и возвращает соответственно true или false.<br />
+</div>
+    <script type="text/javascript">
+        let div = document.querySelector("#alert-div");
+        div.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        div.style.border = "1px solid gray";
+        div.style.borderRadius = "8px";
+        div.style.backgroundColor = "blueviolet";
+        div.style.fontWeight = "bold";
+        div.style.margin = "8px";
+        div.style.padding = "15px";
+        function math(a, sign, b) {
+            switch (sign) {
+                case '+':
+                    {
+                        return a + b;
+                    }
+                case '-':
+                    {
+                        return a - b;
+                    }
+                case '*':
+                    {
+                        return a * b;
+                    }
+                case '/':
+                    {
+                        return a / b;
+                    }
+                default:
+                    return;
+            }
+        }
+        let a = +prompt('Введите первое число');
+        let sign = prompt('Введите знак операции');
+        let b = +prompt('Введите второе число');
+        let Result = math(a, sign, b);
+        alert(Result);
+    </script>
+</body>
+</html>

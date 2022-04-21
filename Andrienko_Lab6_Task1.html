@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Создание обьекта</title>
+    <style>
+        body 
+        {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        p 
+        {
+            border: 1px solid powderblue;
+            padding: 17px;
+            color:blueviolet
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+        let doc =
+        {
+            title: "",
+            body: "",
+            footer: "",
+            date: "",
+          print: function (name)
+          {
+                document.write("<p>" + "Заголовок " + name + " : " + this.title);
+                document.write("<p>" + "Тело " + name + " : " + this.body);
+                document.write("<p>" + "Футер " + name + " : " + this.footer);
+                document.write("<p>" + "Дата " + name + " : " + this.date);
+            }
+        };
+        let Document = doc;
+        Document.application = doc;
+        Document.append = function ()
+        {
+            Document.title = prompt("Введите заголовок");
+            Document.application.title = Document.title;
+            Document.body = prompt("Введите тело");
+            Document.application.body = Document.body;
+            Document.footer = prompt("Введите футер");
+            Document.application.footer = Document.footer;
+            Document.date = prompt("Введите дату");
+            Document.application.date = Document.date;
+        };
+        Document.append();
+        Document.print("документа");
+        Document.application.print("приложения");
+    </script>
+</body>
+</html>

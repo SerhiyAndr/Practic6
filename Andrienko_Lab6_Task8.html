@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Игра арканоид</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="500" height="600" id="game"></canvas>
+    <script type="text/javascript">
+        //Переменная для работы с холстом, на котором будет нарисована игра
+        const canvas = document.getElementById('game');
+        const context = canvas.getContext('2d');
+        //Каждый ряд состоит из 14 кирпичей. На уровне будут 6 пустых рядов, а затем 8 рядов с кирпичами
+        //Цвета кирпичей: красный, оранжевый, зелёный и жёлтый
+        //Буква в массиве означает цвет кирпича
+        const level1 = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R'],
+            ['R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R'],
+            ['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'],
+            ['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'],
+            ['G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G'],
+            ['G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G'],
+            ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'],
+            ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'] 
+        ];
+        //Сопоставляем буквы (R, O, G, Y) с цветами
+        const colorMap = {
+            'R': 'red',
+            'O': 'orange',
+            'G': 'green',
+            'Y': 'yellow'
+        };
+        //Делаем зазор в 3 пикселя между кирпичами, чтобы отделить их друг от друга
+        const brickGap = 3;
+        //Размеры каждого кирпича
+        const brickWidth = 25;
+        const brickHeight = 12;
+        // Ширина стены должна занимать оставшееся место на холсте с каждой стороны
+        // У нас 14 кирпичей по 25 пикселей и 13 промежутков по 2 пикселя, а общая ширина холста — 400 пикселей
+        // Получаем общую ширину стен: 400 − (14 × 25 + 2 × 13) = 24px.
+        // Разделим пополам, чтобы получить ширину каждой стены, и получим 12px
+        const wallSize = 12;
+        // Основной массив для игры
+        const bricks = [];
+        // Создадим уровень так: обработаем весь массив level1
+        // И те места, которые обозначены каким-либо цветом, поместим в игровой массив.
+        // Там же будем хранить координаты начала каждого кирпича и его цвет
+        // Пока у нас есть необработанные элементы в массиве с уровнем — обрабатываем их
+        for (let row = 0; row < level1.length; row++)
+        {
+            for (let col = 0; col < level1[row].length; col++)
+            {
+                //Находим цвет кирпича
+                const colorCode = level1[row][col];
+                //Создаём новый элемент игрового массива — с координатами кирпича, цветом, шириной и высотой кирпича
+                bricks.push({
+                    x: wallSize + (brickWidth + brickGap) * col,
+                    y: wallSize + (brickHeight + brickGap) * row,
+                    color: colorMap[colorCode],
+                    width: brickWidth,
+                    height: brickHeight
+                });
+            }
+        }
+        //Платформа, которой управляет игрок
+        const paddle =
+        {   //Ставим её внизу по центру поля
+            x: canvas.width / 2 - brickWidth / 2,
+            y: 440,
+            //Делаем её размером с кирпич
+            width: brickWidth,
+            height: brickHeight,
+            //Пока платформа никуда не движется, поэтому направление движения равно нулю
+            dx: 0
+        };
+        // Шарик, который отскакивает от платформы и уничтожает кирпичи
+        const ball = {
+            //Стартовые координаты
+            x: 130, y: 260,
+            //Высота и ширина (для простоты это будет квадратный шарик)
+            width: 5, height: 5,
+            //Скорость шарика по обеим координатам
+            speed: 2,
+            //На старте шарик пока никуда не смещается
+            dx: 0, dy: 0
+        };
+        //Проверка на пересечение объектов
+        function collides(obj1, obj2)
+        {
+            return obj1.x < obj2.x + obj2.width && obj1.x + obj1.width > obj2.x && obj1.y < obj2.y + obj2.height &&  obj1.y + obj1.height > obj2.y;
+        }
+        //Главный цикл игры
+        function loop() {
+           //На каждом кадре — очищаем поле и рисуем всё заново
+            requestAnimationFrame(loop);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+           //Двигаем платформу с нужной скоростью
+            paddle.x += paddle.dx;
+           //При этом смотрим, чтобы она не уехала за стены
+            if (paddle.x < wallSize)
+            {
+                paddle.x = wallSize
+            }
+            else if (paddle.x + brickWidth > canvas.width - wallSize)
+            {
+                paddle.x = canvas.width - wallSize - brickWidth;
+            }
+            //Шарик тоже двигается со своей скоростью
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            //И его тоже нужно постоянно проверять, чтобы он не улетел за границы стен
+            //Смотрим левую и правую стенки
+            if (ball.x < wallSize)
+            {
+                ball.x = wallSize;
+                ball.dx *= -1;
+            }
+            else if (ball.x + ball.width > canvas.width - wallSize)
+            {
+                ball.x = canvas.width - wallSize - ball.width;
+                ball.dx *= -1;
+            }
+            //Проверяем верхнюю границу
+            if (ball.y < wallSize)
+            {
+                ball.y = wallSize;
+                ball.dy *= -1;
+            }
+            //Перезагружаем шарик, если он улетел вниз, за край игрового поля
+            if (ball.y > canvas.height)
+            {
+                ball.x = 130;
+                ball.y = 260;
+                ball.dx = 0;
+                ball.dy = 0;
+            }
+            //Проверяем, коснулся ли шарик платформы, которой управляет игрок. Если коснулся — меняем направление движения шарика по оси Y на противоположное
+            if (collides(ball, paddle)) {
+                ball.dy *= -1;
+             //Сдвигаем шарик выше платформы, чтобы на следующем кадре это снова не засчиталось за столкновение
+                ball.y = paddle.y - ball.height;
+            }
+            //Проверяем, коснулся ли шарик цветного кирпича
+            //Если коснулся — меняем направление движения шарика в зависимости от стенки касания
+            //Для этого в цикле проверяем каждый кирпич на касание
+            for (let i = 0; i < bricks.length; i++) {
+            //Берём очередной кирпич
+                const brick = bricks[i];
+            //Если было касание
+                if (collides(ball, brick)) {
+                  //Убираем кирпич из массива
+                    bricks.splice(i, 1);
+                    //Если шарик коснулся кирпича сверху или снизу — меняем направление движения шарика по оси Y
+                    if (ball.y + ball.height - ball.speed <= brick.y || ball.y >= brick.y + brick.height - ball.speed)
+                    {
+                        ball.dy *= -1;
+                    }
+                    //В противном случае меняем направление движения шарика по оси X
+                    else
+                    {
+                        ball.dx *= -1;
+                    }
+                    //Как нашли касание — сразу выходим из цикла проверки
+                    break;
+                }
+            }
+            //Рисуем стены
+            context.fillStyle = 'lightgrey';
+            context.fillRect(0, 0, canvas.width, wallSize);
+            context.fillRect(0, 0, wallSize, canvas.height);
+            context.fillRect(canvas.width - wallSize, 0, wallSize, canvas.height);
+            //Если шарик в движении — рисуем его
+            if (ball.dx || ball.dy)
+            {
+                context.fillRect(ball.x, ball.y, ball.width, ball.height);
+            }
+            //Рисуем кирпичи
+            bricks.forEach(function (brick)
+            {
+                context.fillStyle = brick.color;
+                context.fillRect(brick.x, brick.y, brick.width, brick.height);
+            });
+            //Рисуем платформу
+            context.fillStyle = 'cyan';
+            context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+        //Отслеживаем нажатия игрока на клавиши
+        document.addEventListener('keydown', function (e) {
+            //Стрелка влево
+            if (e.which === 37) {
+                paddle.dx = -3;
+            }
+            //Стрелка вправо
+            else if (e.which === 39)
+            {
+                paddle.dx = 3;
+            }
+            //Обрабатываем нажатие на пробел
+            //Если шарик не запущен — запускаем его из начальной точки, сверху вниз
+            if (ball.dx === 0 && ball.dy === 0 && e.which === 32) {
+                ball.dx = ball.speed;
+                ball.dy = ball.speed;
+            }
+        });
+        //Как только игрок перестал нажимать клавиши со стрелками — останавливаем платформу
+        document.addEventListener('keyup', function (e)
+        {
+            if (e.which === 37 || e.which === 39)
+            {
+                paddle.dx = 0;
+            }
+        });
+        //Запускаем игру
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

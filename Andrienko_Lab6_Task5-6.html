@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Обьект MathFrameWork </title>
+</head>
+<body>
+    <script type="text/javascript">
+        let MathFrameWork =
+        {
+            NumboneArg: 0,
+            NumbtwoArg: 0,
+            sign: '',
+            result: 0,
+            math: function ()
+            {
+                let signs = (Number1, Number2) =>
+                {
+                    switch (this.sign)
+                    {
+                        case '+':
+                            return Number1 + Number2;
+                        case '-':
+                            return Number1 - Number2;
+                        case '*':
+                            return Number1 * Number2;
+                        case '/':
+                            return Number1 / Number2;
+                    }
+                }
+                if (!isNaN(this. NumboneArg.a) && !isNaN(this.NumboneArg.b) && !isNaN(this. NumbtwoArg.a) && !isNaN(this. NumbtwoArg.b)
+                )
+                {
+                    Object.defineProperty(this, 'result',
+                        {
+                        value:
+                        {
+                                result: `${signs(this.NumboneArg.a, this.NumbtwoArg.a)}, ${signs(this.NumboneArg.b, this. NumbtwoArg.b)}`
+                        }
+                    });
+                }
+                if (!isNaN(this.NumboneArg) && !isNaN(this. NumbtwoArg))
+                {
+                    Object.defineProperty(this, 'result',
+                        {
+                            value: signs(this.NumboneArg, this.NumbtwoArg)
+                    });
+                }
+                let isFirstArr =  Array.isArray(this.NumboneArg);
+                let isSecondArr = Array.isArray(this.NumbtwoArg);
+                if (isFirstArr && isSecondArr)
+                {
+                    if (this.NumboneArg.length !== this.NumbtwoArg.length)
+                    {
+                        return;
+                    }
+                    let resultsArr = [];
+                    for (let index = 0; index < this.NumboneArg.length; index++)
+                    {
+                        resultsArr.push(signs(this.NumboneArg[index], this.NumbtwoArg[index]
+                        ));
+                    }
+                    Object.defineProperty(this, 'result',
+                        {
+                        value: resultsArr
+                    });
+                }
+            }
+        };
+        MathFrameWork.NumboneArg = 1743;
+        MathFrameWork.sign = '/';
+        MathFrameWork.NumbtwoArg = 3;
+        MathFrameWork.math();
+        alert("Ответ операции деления: " + MathFrameWork.result);
+        MathFrameWork.NumboneArg = [5, 5, 7, 90,91,111,120];
+        MathFrameWork.sign = '*';
+        MathFrameWork.NumbtwoArg = [40, 60, 75, 1,10,5,7];
+        MathFrameWork.math();
+        alert("Ответ операции умножения: " + MathFrameWork.result);
+        MathFrameWork.NumboneArg = [5, 10, 15, 90, 95, 1100, 1210];
+        MathFrameWork.sign = '+';
+        MathFrameWork.NumbtwoArg = [8, 15, 25, 60, 105, 11500, 11111];
+        MathFrameWork.math();
+        alert("Ответ операции сложения: " + MathFrameWork.result);
+        MathFrameWork.NumboneArg =
+        {
+            a: 12340, b: 50500
+        };
+        MathFrameWork.sign = '-';
+        MathFrameWork.NumbtwoArg =
+        {
+            a: 8340, b: 45500
+        };
+        MathFrameWork.math();
+        alert("Ответ операции вычитания: " + MathFrameWork.result.result);
+    </script>
+</body>
+</html>

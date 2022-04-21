@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Проверка двух чисел</title>
+</head>
+<body>
+    <script type="text/javascript">
+        function math(aArg, sign, bArg)
+        {
+            let isaArr = Array.isArray(aArg);
+            let isbArr = Array.isArray(bArg);
+            if (!isaArr && !isbArr)
+            {
+                switch (sign)
+                {
+                    case '+':
+                        {
+                            return aArg + bArg;
+                        }
+                    case '-':
+                        {
+                            return aArg - bArg;
+                        }
+                    case '*':
+                        {
+                            return aArg * bArg;
+                        }
+                    case '/':
+                        {
+                            return aArg / bArg;
+                        }
+                    default:
+                        return;
+                }
+            }
+            else if (isaArr && isbArr)
+            {
+                if (aArg.length !== bArg.length)
+                {
+                    return;
+                }
+                let resultsArr = [];
+                for (let index = 0; index < aArg.length; index++)
+                {
+                    switch (sign)
+                    {
+                        case '+':
+                            {
+                                resultsArr.push(aArg[index] + bArg[index]);
+                                break;
+                            }
+                        case '-':
+                            {
+                                resultsArr.push(aArg[index] - bArg[index]);
+                                break;
+                            }
+                        case '*':
+                            {
+                                resultsArr.push(aArg[index] * bArg[index]);
+                                break;
+                            }
+                        case '/':
+                            {
+                                resultsArr.push(aArg[index] / bArg[index]);
+                                break;
+                            }
+                        default:
+                            return;
+                    }
+                }
+                return resultsArr;
+            }
+        }
+        let mathResult =  math(50, '*', 4000);
+        let mathResult1 = math(50, '+', 4000);
+        let mathResult2 = math(160000, '-', 4000);
+        let mathResult3 = math(160000, '/', 4000);
+        alert("Ответ операции умножения: " + mathResult);
+        alert("Ответ операции сложения: " + mathResult1);
+        alert("Ответ операции вычитания: " + mathResult2);
+        alert("Ответ операции деления: " + mathResult3);
+    </script>
+</body>
+</html>
